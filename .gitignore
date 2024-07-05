@@ -1,0 +1,7 @@
+sdxl-turbo
+output/*
+checkpoints/*
+configs/*
+upscaler/*
+.idea
+.venv
