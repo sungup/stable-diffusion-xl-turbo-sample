@@ -37,3 +37,8 @@ model checkpoints.
 #### upscaler
 
 Not yet ready to explain
+
+## Performance Check
+
+In my RTX-3070 GPU + Ryzen 5 5600x 6-Core process, this code shows loading SDXL Turbo model in 20sec. I'll record the
+loading and inference speed on the other system A100 and H100.
