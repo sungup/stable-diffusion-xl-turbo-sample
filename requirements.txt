@@ -1,7 +1,12 @@
-diffusers >= 0.29.2
 accelerate >= 0.32.1
+basicsr
+diffusers >= 0.29.2
+ninja
+numpy
+pillow
+realesrgan
 torch == 2.3.0
 torchvision == 0.18.0
-realesrgan
 transformers
 xformers
+wheel
