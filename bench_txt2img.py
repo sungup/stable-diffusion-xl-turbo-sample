@@ -152,7 +152,7 @@ def parse_args():
     return arguments
 
 
-def main():
+def txt2img():
     args = parse_args()
 
     perf_mon = PerfMon()
@@ -187,4 +187,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    txt2img()
