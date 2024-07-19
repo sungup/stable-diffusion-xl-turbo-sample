@@ -1,3 +1,5 @@
+"""Module providing functionality for upscaling images."""
+
 import diffuserbm.upscale.core as core
 import diffuserbm.upscale.real_esrgan
 

@@ -1,3 +1,5 @@
+"""Module providing functionality for diffuserbm pipeline."""
+
 import diffuserbm.pipeline.core as core
 import diffuserbm.pipeline.general
 

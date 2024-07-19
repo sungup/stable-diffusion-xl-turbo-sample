@@ -1,3 +1,5 @@
+"""Module providing core functionality for diffuserbm pipeline."""
+
 import os
 
 from collections import namedtuple
@@ -26,7 +28,16 @@ class BenchmarkPipeline:
     def __init__(self, checkpoint, device, **_):
         pass
 
-    def __call__(self, prompt, negative, rand_gen, width, height, denoising_steps, guidance_scale) -> ndarray:
+    def __call__(
+            self,
+            prompt,
+            negative,
+            rand_gen,
+            width,
+            height,
+            denoising_steps,
+            guidance_scale
+    ) -> ndarray:
         raise Exception('please define inherited function of BenchmarkPipeline.__call__')
 
 

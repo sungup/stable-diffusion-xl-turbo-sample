@@ -1,3 +1,5 @@
+"""Module providing pipeline functionality for the Stable Diffusion XL in benchmark"""
+
 import torch
 
 from diffuserbm.pipeline.core import BenchmarkPipeline
@@ -30,7 +32,16 @@ class StableDiffusionXLBenchmarkPipeline(BenchmarkPipeline, type='xl'):
         # elif device == 'mps':
         #     self.pipeline.enable_attention_slicing()
 
-    def __call__(self, prompt, negative, rand_gen, width, height, denoising_steps, guidance_scale) -> ndarray:
+    def __call__(
+            self,
+            prompt,
+            negative,
+            rand_gen,
+            width,
+            height,
+            denoising_steps,
+            guidance_scale
+    ) -> ndarray:
         return self.pipeline(
             prompt=prompt,
             negative_prompt=negative,

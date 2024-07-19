@@ -1,3 +1,5 @@
+"""Module providing benchmark functionality for the stable diffusion text to image conversion."""
+
 import argparse
 import numpy as np
 import os
@@ -34,8 +36,10 @@ class Bench:
         self.upscaler = upscaler
 
         with self.__perf.measure_latency('Load Randomizer', 'model'):
-            self.generators = [torch.Generator(device=self.device).manual_seed(int(random.randrange(1, 9999)))
-                               for _ in range(self.batch_size)]
+            self.generators = [
+                torch.Generator(device=self.device).manual_seed(int(random.randrange(1, 9999)))
+                for _ in range(self.batch_size)
+            ]
 
     def __generate__(self, prompt, negative_prompt, width, height, denoising_steps, guidance_scale):
         with self.__perf.measure_latency('Images Generation', 'gen'):
@@ -58,17 +62,18 @@ class Bench:
         return images
 
     def __save_image__(self, images, prompt):
-        basename = '-'.join([re.sub(r'[^a-zA-Z0-9]', '', word) for word in prompt[:Bench.MAX_FILE_WORD]])
+        basename = '-'.join([re.sub(r'[^a-zA-Z0-9]', '', word)
+                             for word in prompt[:Bench.MAX_FILE_WORD]])
         basename += '-'+str(random.randint(1000, 9999))
 
         for i, image in enumerate(images):
             with self.__perf.measure_latency('Images Save', 'image'):
                 image.save(os.path.join(self.output, basename+'-'+str(i)+'.png'))
 
-    def generate(self, prompt, negative_prompt, width, height, denoising_steps, guidance_scale):
+    def generate(self, prompt, negative, width, height, denoising_steps, guidance_scale):
         self.__save_image__(
             self.__upscale__(
-                self.__generate__(prompt, negative_prompt, width, height, denoising_steps, guidance_scale)
+                self.__generate__(prompt, negative, width, height, denoising_steps, guidance_scale)
             ),
             prompt
         )
@@ -77,7 +82,7 @@ class Bench:
         self,
         iteration,
         prompt,
-        negative_prompt,
+        negative,
         width,
         height,
         denoising_steps=consts.DEFAULT_DENOISING_STEPS,
@@ -85,7 +90,7 @@ class Bench:
     ):
         for _ in range(iteration):
             with self.__perf.measure_latency('End-to-End Generation', 'iter'):
-                self.generate(prompt, negative_prompt, width, height, denoising_steps, guidance_scale)
+                self.generate(prompt, negative, width, height, denoising_steps, guidance_scale)
 
 
 def post_arguments(args):
@@ -97,7 +102,8 @@ def post_arguments(args):
 
 
 def add_arguments(parser):
-    parser.add_argument('--device', type=str, default=consts.DEFAULT_DEVICE, choices=["cuda", "cpu", "npu"],
+    parser.add_argument('--device', type=str, default=consts.DEFAULT_DEVICE,
+                        choices=["cuda", "cpu", "npu"],
                         help="Inference target device")
     parser.add_argument('--batch-size', type=int, default=consts.DEFAULT_BATCH_SIZE,
                         help="Number of images to generate in a sequence, one  at a time")
@@ -111,7 +117,8 @@ def add_arguments(parser):
                         help="Benchmark result file path")
     parser.add_argument('--output', type=str, default=consts.DEFAULT_OUTPUT,
                         help="A directory to save images")
-    parser.add_argument('--format', type=str, default=consts.DEFAULT_FORMAT, choices=consts.RESULT_FORMAT,
+    parser.add_argument('--format', type=str, default=consts.DEFAULT_FORMAT,
+                        choices=consts.RESULT_FORMAT,
                         help="Result file format")
     parser.add_argument('--denoising-steps', type=int, default=consts.DEFAULT_DENOISING_STEPS,
                         help="Number of denoising steps")
@@ -119,7 +126,8 @@ def add_arguments(parser):
                         help="Number of guidance scale")
     parser.add_argument('--prompt', type=str, nargs='+', default=consts.DEFAULT_PROMPT,
                         help="prompt to generate image")
-    parser.add_argument('--negative-prompt', type=str, nargs='*', default=consts.DEFAULT_NEGATIVE_PROMPT,
+    parser.add_argument('--negative-prompt', type=str, nargs='*',
+                        default=consts.DEFAULT_NEGATIVE_PROMPT,
                         help="Negative prompt to avoid from image")
 
 

@@ -4,11 +4,16 @@ import time
 from collections import defaultdict
 
 
-_LATENCY_TABLE_HEADER_FORMAT = '| {:25} | {:17} | {:5} | {:23} |'.format('name', 'total', 'count', 'each')
-_LATENCY_TABLE_ROW_SPLITTER = '+{}+{}+{}+{}+'.format('-' * 27, '-' * 19, '-' * 7, '-' * 25)
-_LATENCY_TABLE_ROW_FORMAT = '| {name:25} | {total:-12,.2f} msec | {count:-5} | {each:-12,.2f} msec/{unit:5} |'
-_LATENCY_CSV_HEADER_FORMAT = 'name,total,count,each,unit'
-_LATENCY_CSV_ROW_FORMAT = '{name},{total:.2f},{count},{each:.2f},msec/{unit}'
+_LATENCY_TABLE_HEADER_FORMAT = \
+    '| {:25} | {:17} | {:5} | {:23} |'.format('name', 'total', 'count', 'each')
+_LATENCY_TABLE_ROW_SPLITTER = \
+    '+{}+{}+{}+{}+'.format('-' * 27, '-' * 19, '-' * 7, '-' * 25)
+_LATENCY_TABLE_ROW_FORMAT = \
+    '| {name:25} | {total:-12,.2f} msec | {count:-5} | {each:-12,.2f} msec/{unit:5} |'
+_LATENCY_CSV_HEADER_FORMAT = \
+    'name,total,count,each,unit'
+_LATENCY_CSV_ROW_FORMAT = \
+    '{name},{total:.2f},{count},{each:.2f},msec/{unit}'
 
 
 class _Latency:
@@ -85,7 +90,12 @@ class _LatencyAggregator:
         }
 
     def __str__(self):
-        return f'{self.__name}: {self.__value:,.2f} msec, {(self.__value / self.__count):,.2f} msec/{self.__unit}'
+        return '{name}: {total} msec, {each} msec/{unit}'.format(
+            name=self.__name,
+            total=self.__value,
+            each=self.__value / self.__count,
+            unit=self.__unit,
+        )
 
     @property
     def __table_row__(self):
@@ -160,7 +170,9 @@ class PerfMon:
 
     @property
     def csv(self):
-        return '\n'.join([_LATENCY_CSV_HEADER_FORMAT] + [v.__csv_row__ for v in self.__aggregated_latency__])
+        return '\n'.join(
+            [_LATENCY_CSV_HEADER_FORMAT] + [v.__csv_row__ for v in self.__aggregated_latency__]
+        )
 
     def report(self, format_type):
         return self.__getattribute__(format_type)

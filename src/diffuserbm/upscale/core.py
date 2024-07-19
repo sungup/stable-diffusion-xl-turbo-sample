@@ -1,3 +1,5 @@
+"""Module providing core functionality for upscaler of diffuserbm."""
+
 _UPSCALERS = {}
 
 

@@ -1,3 +1,5 @@
+"""Module providing a set of constants used by benchmark"""
+
 DEFAULT_DENOISING_STEPS = 4
 DEFAULT_GUIDANCE_SCALE = 0.0
 
