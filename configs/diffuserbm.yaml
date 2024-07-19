@@ -1,0 +1,40 @@
+configs:
+  model:
+    v1:
+      source: "https://raw.githubusercontent.com/CompVis/stable-diffusion/main/configs/stable-diffusion/v1-inference.yaml"
+      dest: "configs/v1-inference.yaml"
+    v2:
+      source: "https://raw.githubusercontent.com/Stability-AI/stablediffusion/main/configs/stable-diffusion/v2-inference-v.yaml"
+      dest: "configs/v2-inference.yaml"
+    xl:
+      source: "https://raw.githubusercontent.com/Stability-AI/generative-models/main/configs/inference/sd_xl_base.yaml"
+      dest: "configs/xl-base-inference.yaml"
+  sub_model:
+    v1:
+      source: "https://huggingface.co/runwayml/stable-diffusion-v1-5"
+      dest: "stable-diffusion-v1-5"
+    v2:
+      source: "https://huggingface.co/stabilityai/stable-diffusion-2-1"
+      dest: "stable-diffusion-2-1"
+    xl:
+      source: "https://huggingface.co/stabilityai/sdxl-turbo"
+      dest: "sdxl-turbo"
+
+checkpoints:
+  v1:
+    - source: "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors"
+      dest: "checkpoints/v1-5-pruned-emaonly.safetensors"
+    - source: "https://civitai.com/api/download/models/128713"
+      dest: "checkpoints/dreamshaper_8.safetensors"
+    - source: "https://civitai.com/api/download/models/501240"
+      dest: "checkpoints/realisticVisionV60B1_v51HyperVAE.safetensors"
+  v2:
+    - source: "https://huggingface.co/stabilityai/stable-diffusion-2-1/resolve/main/v2-1_768-ema-pruned.safetensors"
+      dest: "checkpoints/v2-1_768-ema-pruned.safetensors"
+  xl:
+    - source: "https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors"
+      dest: "checkpoints/sd_xl_turbo_1.0_fp16.safetensors"
+    - source: "https://civitai.com/api/download/models/351306"
+      dest: "checkpoints/dreamshaperXL_v21TurboDPMSDE.safetensors"
+    - source: "https://civitai.com/api/download/models/361593"
+      dest: "checkpoints/realvisxlV40_v40LightningBakedvae.safetensors"

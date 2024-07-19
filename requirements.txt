@@ -4,7 +4,9 @@ diffusers >= 0.29.2
 ninja
 numpy
 pillow
+pyyaml
 realesrgan
+requests
 torch >= 2.3.1
 torchvision >= 0.18.1
 transformers

@@ -7,36 +7,15 @@ import torch
 
 from PIL import Image
 
-# module based diffuserbm
 import diffuserbm.upscale as upscale
 import diffuserbm.pipeline as pipelines
 from diffuserbm.perf import PerfMon
+from diffuserbm.bench import consts
 
 
-DEFAULT_DEVICE = "mps"
-DEFAULT_BATCH_SIZE = 4
-DEFAULT_BATCH_COUNT = 5
-DEFAULT_WIDTH = 768
-DEFAULT_HEIGHT = 512
-DEFAULT_RESULT = "stdout"
-DEFAULT_FORMAT = "table"
-DEFAULT_OUTPUT = "output"
-DEFAULT_DENOISING_STEPS = 4
-DEFAULT_GUIDANCE_SCALE = 0.0
+class Bench:
+    MAX_FILE_WORD = 5
 
-DEFAULT_PROMPT = """
-cherry blossom, bonsai, Japanese style landscape, high resolution, 8k, lush green in the background
-""".split(' ')
-DEFAULT_NEGATIVE_PROMPT = """
-Low quality, Low resolution, disfigured, ugly, bad, immature, cartoon, anime, 3d, painting, b&w
-""".split(' ')
-
-RESULT_FORMAT = ['table', 'text', 'csv', 'json']
-
-MAX_FILE_WORD = 5
-
-
-class Text2ImageBench:
     def __init__(self, batch_size, batch_count, device, output, perf: PerfMon):
         self.__perf = perf
 
@@ -79,7 +58,7 @@ class Text2ImageBench:
         return images
 
     def __save_image__(self, images, prompt):
-        basename = '-'.join([re.sub(r'[^a-zA-Z0-9]', '', word) for word in prompt[:MAX_FILE_WORD]])
+        basename = '-'.join([re.sub(r'[^a-zA-Z0-9]', '', word) for word in prompt[:Bench.MAX_FILE_WORD]])
         basename += '-'+str(random.randint(1000, 9999))
 
         for i, image in enumerate(images):
@@ -101,64 +80,71 @@ class Text2ImageBench:
         negative_prompt,
         width,
         height,
-        denoising_steps=DEFAULT_DENOISING_STEPS,
-        guidance_scale=DEFAULT_GUIDANCE_SCALE
+        denoising_steps=consts.DEFAULT_DENOISING_STEPS,
+        guidance_scale=consts.DEFAULT_GUIDANCE_SCALE
     ):
         for _ in range(iteration):
             with self.__perf.measure_latency('End-to-End Generation', 'iter'):
                 self.generate(prompt, negative_prompt, width, height, denoising_steps, guidance_scale)
 
 
+def post_arguments(args):
+    if args.height < 500:
+        raise Exception("height cannot smaller then 500")
+
+    if args.width < 500:
+        raise Exception("width cannot smaller than 500")
+
+
+def add_arguments(parser):
+    parser.add_argument('--device', type=str, default=consts.DEFAULT_DEVICE, choices=["cuda", "cpu", "npu"],
+                        help="Inference target device")
+    parser.add_argument('--batch-size', type=int, default=consts.DEFAULT_BATCH_SIZE,
+                        help="Number of images to generate in a sequence, one  at a time")
+    parser.add_argument('--iteration', type=int, default=consts.DEFAULT_BATCH_COUNT,
+                        help="Number of repeat prompt")
+    parser.add_argument('--height', type=int, default=consts.DEFAULT_HEIGHT,
+                        help="Height of image to generate (must be multiple of 8")
+    parser.add_argument('--width', type=int, default=consts.DEFAULT_WIDTH,
+                        help="Width of image to generate (must be multiple of 8")
+    parser.add_argument('--result', type=str, default=consts.DEFAULT_RESULT,
+                        help="Benchmark result file path")
+    parser.add_argument('--output', type=str, default=consts.DEFAULT_OUTPUT,
+                        help="A directory to save images")
+    parser.add_argument('--format', type=str, default=consts.DEFAULT_FORMAT, choices=consts.RESULT_FORMAT,
+                        help="Result file format")
+    parser.add_argument('--denoising-steps', type=int, default=consts.DEFAULT_DENOISING_STEPS,
+                        help="Number of denoising steps")
+    parser.add_argument('--guidance-scale', type=float, default=consts.DEFAULT_GUIDANCE_SCALE,
+                        help="Number of guidance scale")
+    parser.add_argument('--prompt', type=str, nargs='+', default=consts.DEFAULT_PROMPT,
+                        help="prompt to generate image")
+    parser.add_argument('--negative-prompt', type=str, nargs='*', default=consts.DEFAULT_NEGATIVE_PROMPT,
+                        help="Negative prompt to avoid from image")
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Options for Stable Diffusion XL Turbo Simple Benchmark",
                                      conflict_handler='resolve')
 
-    parser.add_argument('--device', type=str, default=DEFAULT_DEVICE, choices=["cuda", "cpu", "npu"],
-                        help="Inference target device")
-    parser.add_argument('--batch-size', type=int, default=DEFAULT_BATCH_SIZE,
-                        help="Number of images to generate in a sequence, one  at a time")
-    parser.add_argument('--iteration', type=int, default=DEFAULT_BATCH_COUNT,
-                        help="Number of repeat prompt")
-    parser.add_argument('--height', type=int, default=DEFAULT_HEIGHT,
-                        help="Height of image to generate (must be multiple of 8")
-    parser.add_argument('--width', type=int, default=DEFAULT_WIDTH,
-                        help="Width of image to generate (must be multiple of 8")
-    parser.add_argument('--result', type=str, default=DEFAULT_RESULT,
-                        help="Benchmark result file path")
-    parser.add_argument('--output', type=str, default=DEFAULT_OUTPUT,
-                        help="A directory to save images")
-    parser.add_argument('--format', type=str, default=DEFAULT_FORMAT, choices=RESULT_FORMAT,
-                        help="Result file format")
-    parser.add_argument('--denoising-steps', type=int, default=DEFAULT_DENOISING_STEPS,
-                        help="Number of denoising steps")
-    parser.add_argument('--guidance-scale', type=float, default=DEFAULT_GUIDANCE_SCALE,
-                        help="Number of guidance scale")
-    parser.add_argument('--prompt', type=str, nargs='+', default=DEFAULT_PROMPT,
-                        help="prompt to generate image")
-    parser.add_argument('--negative-prompt', type=str, nargs='*', default=DEFAULT_NEGATIVE_PROMPT,
-                        help="Negative prompt to avoid from image")
-
+    add_arguments(parser)
     upscale.add_arguments(parser)
     pipelines.add_arguments(parser)
 
     arguments = parser.parse_args()
 
-    if arguments.height < 500:
-        raise Exception("height cannot smaller then 500")
-
-    if arguments.width < 500:
-        raise Exception("width cannot smaller than 500")
+    post_arguments(arguments)
 
     return arguments
 
 
-def txt2img():
+def bench():
     args = parse_args()
 
     perf_mon = PerfMon()
 
     with perf_mon.measure_latency('End-to-End Benchmark', 'run'):
-        bench = Text2ImageBench(args.batch_size, args.iteration, args.device, args.output, perf_mon)
+        bm = Bench(args.batch_size, args.iteration, args.device, args.output, perf_mon)
 
         with perf_mon.measure_latency('Load Checkpoint', 'model'):
             pipeline = pipelines.make(**args.__dict__)
@@ -167,9 +153,9 @@ def txt2img():
         with perf_mon.measure_latency('Load Upscaler', 'model'):
             upscaler = upscale.make(**args.__dict__)
 
-        bench.init_bench(pipeline=pipeline, upscaler=upscaler)
+        bm.init_bench(pipeline=pipeline, upscaler=upscaler)
 
-        bench.run(
+        bm.run(
             args.iteration,
             args.prompt,
             args.negative_prompt,
@@ -184,7 +170,3 @@ def txt2img():
     else:
         with open(args.result, 'w') as out:
             out.write(perf_mon.report(args.format))
-
-
-if __name__ == '__main__':
-    txt2img()
