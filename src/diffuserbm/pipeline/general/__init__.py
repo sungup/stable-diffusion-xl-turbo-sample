@@ -1,1 +1,1 @@
-import diffuserbm.pipeline.general.sdxl_turbo
+import diffuserbm.pipeline.general.xl

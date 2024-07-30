@@ -19,7 +19,7 @@ _PIPELINES = {}
 
 class BenchmarkPipeline:
     def __init_subclass__(cls, **kwargs):
-        _PIPELINES[kwargs['type']] = cls
+        _PIPELINES[kwargs['name']] = cls
 
         config = _STABLE_DIFFUSION_CONFIG[kwargs['type']]
         cls.MODEL_CONFIG = config.model_config

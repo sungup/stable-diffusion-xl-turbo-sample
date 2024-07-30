@@ -21,6 +21,7 @@ onnxruntime == 1.18.0           # for CPU
 # onnxruntime-openvino == 1.18.0  # not supported on macos
 # onnxruntime-qnn == 1.18.0       # not supported on macos
 
+optimum >= 1.16.2
 optimum[onnxruntime]       # optimum for normal onnxruntime
 # optimum[onnxruntime-gpu]   # not supported on macos
 # optimum[openvino]          # not supported on macos

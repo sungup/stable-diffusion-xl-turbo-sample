@@ -22,6 +22,7 @@ onnxruntime-gpu == 1.18.0       # for GPUs (NVIDIA or AMD)
 onnxruntime-openvino == 1.18.0  # for Intel OpenVINO platform
 onnxruntime-qnn == 1.18.0       # for Qualcomm Snapdragon
 
+optimum >= 1.16.2
 optimum[onnxruntime]       # optimum for normal onnxruntime
 optimum[onnxruntime-gpu]   # optimum for onnxruntime for GPU devices
 optimum[openvino]          # optimum for openvino

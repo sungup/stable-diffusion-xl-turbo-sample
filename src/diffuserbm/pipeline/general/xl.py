@@ -7,7 +7,7 @@ from diffusers import StableDiffusionXLPipeline
 from numpy import ndarray
 
 
-class StableDiffusionXLBenchmarkPipeline(BenchmarkPipeline, type='xl'):
+class StableDiffusionXLBenchmarkPipeline(BenchmarkPipeline, type='xl', name='diffusers.sdxl'):
     def __init__(self, checkpoint, device, **_):
         super().__init__(checkpoint, device)
 

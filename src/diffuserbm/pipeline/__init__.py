@@ -3,6 +3,7 @@
 import diffuserbm.pipeline.core as core
 import diffuserbm.pipeline.general
 
+from diffuserbm.pipeline import onnx
 
 def make(pipeline, checkpoint, device, **kwargs):
     return core.make_pipeline(pipeline, checkpoint, device)

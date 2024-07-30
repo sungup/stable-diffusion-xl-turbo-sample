@@ -4,6 +4,8 @@ checkpoints/*
 models/*
 upscaler/*
 .idea
+.vscode
 .venv
 *.pyc
 *.DS_Store
+requirements.txt
