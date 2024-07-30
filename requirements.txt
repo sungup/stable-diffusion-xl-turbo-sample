@@ -12,10 +12,14 @@ torchvision >= 0.18.1
 transformers
 xformers >= 0.0.27
 wheel
+gitpython
+
+onnxruntime == 1.18.0
+onnxruntime-gpu == 1.18.0
+onnxruntime-openvino = 1.18.0
+# onnxruntime-qnn == 1.18.0
 
 # Install Optimum to stable diffusion onnx runtime for non-NVIDIA accelrator
 optimum[onnxruntime]       # for CPU
 optimum[onnxruntime-gpu]   # for NVIDIA GPU with CUDA/TensorRT
 optimum[openvino]          # for Intel OpenVINO platform
-optimum[amd]               # for AMD NPU
-optimum[ipex]              # for Intel GPU
