@@ -1,7 +1,6 @@
-import requests
 import yaml
 
-from diffuserbm.utils import download
+import diffuserbm.utils as utils
 import diffuserbm.bench.txt2img as txt2img
 
 
@@ -10,14 +9,19 @@ Under developing codes
 """
 
 
-def download_checkpoint():
+def download():
     with open('configs/diffuserbm.yaml', 'r') as f:
         configs = yaml.load(f, Loader=yaml.FullLoader)
 
-    print(configs['checkpoints'])
+    for _, model in configs['configs']['model'].items():
+        utils.download(model['source'], model['dest'])
+
+    for _, model in configs['configs']['sub_model'].items():
+        utils.clone(model['source'], model['dest'])
+
     for _, checkpoints in configs['checkpoints'].items():
         for checkpoint in checkpoints:
-            download(checkpoint['source'], checkpoint['dest'])
+            utils.download(checkpoint['source'], checkpoint['dest'])
 
 
 if __name__ == '__main__':

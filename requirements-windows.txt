@@ -1,0 +1,25 @@
+accelerate >= 0.32.1
+basicsr
+diffusers >= 0.29.2
+ninja
+numpy
+pillow
+pyyaml
+realesrgan
+requests
+torch >= 2.3.1
+torchvision >= 0.18.1
+transformers
+xformers >= 0.0.27
+wheel
+gitpython
+
+onnxruntime == 1.18.0           # for CPU
+onnxruntime-gpu == 1.18.0       # for GPUs (NVIDIA or AMD)
+onnxruntime-openvino == 1.18.0  # for Intel OpenVINO platform
+onnxruntime-qnn == 1.18.0       # for Qualcomm Snapdragon
+
+optimum[onnxruntime]       # optimum for normal onnxruntime
+optimum[onnxruntime-gpu]   # optimum for onnxruntime for GPU devices
+optimum[openvino]          # optimum for openvino
+

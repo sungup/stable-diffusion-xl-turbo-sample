@@ -1,7 +1,9 @@
 sdxl-turbo
 output/*
 checkpoints/*
-configs/*
+models/*
 upscaler/*
 .idea
 .venv
+*.pyc
+*.DS_Store
