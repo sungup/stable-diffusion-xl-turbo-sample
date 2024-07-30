@@ -9,9 +9,9 @@ _StableDiffusionConf = namedtuple('_StableDiffusionConf', ['model_config', 'subm
 
 # TODO need to change configurable
 _STABLE_DIFFUSION_CONFIG = {
-    "v1": _StableDiffusionConf(os.path.join("configs", "v1-inference.yaml"), ""),
-    "v2": _StableDiffusionConf(os.path.join("configs", "v2-inference-v.yaml"), ""),
-    "xl": _StableDiffusionConf(os.path.join("configs", "sd_xl_base.yaml"), "sdxl-turbo"),
+    "v1": _StableDiffusionConf(os.path.join("models", "v1-inference.yaml"), os.path.join("models", "stable-diffusion-v1-5")),
+    "v2": _StableDiffusionConf(os.path.join("models", "v2-inference.yaml"), os.path.join("models", "stable-diffusion-2-1")),
+    "xl": _StableDiffusionConf(os.path.join("models", "xl-base-inference.yaml"), os.path.join("models", "sdxl-turbo")),
 }
 
 _PIPELINES = {}

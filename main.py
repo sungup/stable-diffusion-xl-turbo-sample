@@ -27,4 +27,4 @@ def download():
 if __name__ == '__main__':
     download()
     # Text2Image benchmark
-    #txt2img.bench()
+    txt2img.bench()

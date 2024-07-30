@@ -103,7 +103,7 @@ def post_arguments(args):
 
 def add_arguments(parser):
     parser.add_argument('--device', type=str, default=consts.DEFAULT_DEVICE,
-                        choices=["cuda", "cpu", "npu"],
+                        choices=["cuda", "cpu", "npu", "mps"],
                         help="Inference target device")
     parser.add_argument('--batch-size', type=int, default=consts.DEFAULT_BATCH_SIZE,
                         help="Number of images to generate in a sequence, one  at a time")
