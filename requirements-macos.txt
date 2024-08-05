@@ -1,0 +1,28 @@
+accelerate >= 0.32.1
+basicsr
+diffusers >= 0.29.2
+gitpython
+ninja
+numpy
+pillow
+pyyaml
+realesrgan
+requests
+transformers
+wheel
+
+# install general version of torch
+torch == 2.3.1
+torchvision == 0.18.1
+xformers == 0.0.27
+
+onnxruntime == 1.18.0           # for CPU
+# onnxruntime-gpu == 1.18.0       # not supported on macos
+# onnxruntime-openvino == 1.18.0  # not supported on macos
+# onnxruntime-qnn == 1.18.0       # not supported on macos
+
+optimum >= 1.16.2
+optimum[onnxruntime]       # optimum for normal onnxruntime
+# optimum[onnxruntime-gpu]   # not supported on macos
+# optimum[openvino]          # not supported on macos
+
