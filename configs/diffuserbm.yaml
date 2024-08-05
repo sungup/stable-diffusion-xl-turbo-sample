@@ -1,40 +1,54 @@
 configs:
-  model:
-    v1:
-      source: "https://raw.githubusercontent.com/CompVis/stable-diffusion/main/configs/stable-diffusion/v1-inference.yaml"
-      dest: "models/v1-inference.yaml"
-    v2:
-      source: "https://raw.githubusercontent.com/Stability-AI/stablediffusion/main/configs/stable-diffusion/v2-inference-v.yaml"
-      dest: "models/v2-inference.yaml"
-    xl:
-      source: "https://raw.githubusercontent.com/Stability-AI/generative-models/main/configs/inference/sd_xl_base.yaml"
-      dest: "models/xl-base-inference.yaml"
-  sub_model:
-    v1:
-      source: "https://huggingface.co/runwayml/stable-diffusion-v1-5"
-      dest: "models/stable-diffusion-v1-5"
-    v2:
-      source: "https://huggingface.co/stabilityai/stable-diffusion-2-1"
-      dest: "models/stable-diffusion-2-1"
-    xl:
-      source: "https://huggingface.co/stabilityai/sdxl-turbo"
-      dest: "models/sdxl-turbo"
+  v1:
+    source: "https://raw.githubusercontent.com/CompVis/stable-diffusion/main/configs/stable-diffusion/v1-inference.yaml"
+    dest: "checkpoints/configs/v1-inference.yaml"
+  v2:
+    source: "https://raw.githubusercontent.com/Stability-AI/stablediffusion/main/configs/stable-diffusion/v2-inference-v.yaml"
+    dest: "checkpoints/configs/v2-inference.yaml"
+  xl:
+    source: "https://raw.githubusercontent.com/Stability-AI/generative-models/main/configs/inference/sd_xl_base.yaml"
+    dest: "checkpoints/configs/xl-base-inference.yaml"
 
+# diffuserbm uses splitted checkpoints because there is no way to convert to ONNX format
 checkpoints:
   v1:
-    - source: "https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors"
-      dest: "checkpoints/v1-5-pruned-emaonly.safetensors"
-    - source: "https://civitai.com/api/download/models/128713"
-      dest: "checkpoints/dreamshaper_8.safetensors"
-    - source: "https://civitai.com/api/download/models/501240"
-      dest: "checkpoints/realisticVisionV60B1_v51HyperVAE.safetensors"
+    - id: "runwayml/stable-diffusion-v1-5"
+      dest: "checkpoints/stable-diffusion-v1.5"
+      variant: 'fp16'
+      dtype: 'float16'
+    - id: "lykon/dreamshaper-8"
+      dest: "checkpoints/dreamshaper-8"
+      variant: 'fp16'
+      dtype: 'float16'
   v2:
-    - source: "https://huggingface.co/stabilityai/stable-diffusion-2-1/resolve/main/v2-1_768-ema-pruned.safetensors"
-      dest: "checkpoints/v2-1_768-ema-pruned.safetensors"
+    - id: "stabilityai/stable-diffusion-2-1"
+      dest: "checkpoints/stable-diffusion-v2.1"
+      variant: 'fp16'
+      dtype: 'float16'
   xl:
-    - source: "https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors"
-      dest: "checkpoints/sd_xl_turbo_1.0_fp16.safetensors"
-    - source: "https://civitai.com/api/download/models/351306"
-      dest: "checkpoints/dreamshaperXL_v21TurboDPMSDE.safetensors"
-    - source: "https://civitai.com/api/download/models/361593"
-      dest: "checkpoints/realvisxlV40_v40LightningBakedvae.safetensors"
+    - id: "stabilityai/sdxl-turbo"
+      dest: "checkpoints/sdxl-turbo"
+      variant: 'fp16'
+      dtype: 'float16'
+    - id: "lykon/dreamshaper-xl-v2-turbo"
+      dest: "checkpoints/dreamshaper-xl-turbo"
+      variant: 'fp16'
+      dtype: 'float16'
+
+upscaler:
+  r-esrgan:
+    - source: "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.1/RealESRGAN_x2plus.pth"
+      dest: "checkpoints/upscaler/Real-ESRGAN/RealESRGAN_x2plus.pth"
+      rate: 2
+    - source: "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
+      dest: "checkpoints/upscaler/Real-ESRGAN/RealESRGAN_x4plus.pth"
+      rate: 4
+    - source: "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.1/RealESRNet_x4plus.pth"
+      dest: "checkpoints/upscaler/Real-ESRGAN/RealESRNet_x4plus.pth"
+      rate: 4
+    - source: "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.2.4/RealESRGAN_x4plus_anime_6B.pt"
+      dest: "checkpoints/upscaler/Real-ESRGAN/RealESRGAN_x4plus_anime_6B.pth"
+      rate: 4
+    - source: "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth"
+      dest: "checkpoints/upscaler/Real-ESRGAN/realesr-animevideov3.pth"
+      rate: 4

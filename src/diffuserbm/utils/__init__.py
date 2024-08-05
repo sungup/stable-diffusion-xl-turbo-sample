@@ -1,35 +1,26 @@
 """Module providing utlities for benchmark"""
-
-import git
 import os
-import requests
+
+import yaml
+
+from diffuserbm.utils import download
 
 
-def download(url, path):
-    """Download a file from url and save it to path."""
-    if os.path.exists(path):
-        return
+def build_proj_dir(proj_path: str, config_path: str):
+    """Build project directory from config on the project path."""
+    with open(config_path, 'r', encoding='utf-8') as f:
+        configs = yaml.load(f, Loader=yaml.FullLoader)
 
-    response = requests.get(url, stream=True)
-    with open(path, "wb") as f:
-        for chunk in response.iter_content(chunk_size=1024*1024):
-            f.write(chunk)
+    if not os.path.isdir(proj_path):
+        os.makedirs(proj_path)
 
+    for _, config in configs['configs'].items():
+        download.get(config['source'], os.path.join(proj_path, config['dest']))
 
-def clone(git_url, path, branch='main'):
-    """Clone a repository from url and save it to path."""
-    if os.path.exists(path):
-        return
+    for _, checkpoints in configs['checkpoints'].items():
+        for checkpoint in checkpoints:
+            download.hf_get(checkpoint['id'], os.path.join(proj_path, checkpoint['dest']))
 
-    git.Repo.clone_from(
-        git_url, path,
-        env={
-            'GIT_LFS_SKIP_SMUDGE': '1',
-        },
-        multi_options=[
-            '--single-branch',
-            '--depth', '1',
-        ],
-        branch=branch,
-    )
-
+    for _, upscalers in configs['upscaler'].items():
+        for upscaler in upscalers:
+            download.get(upscaler['source'], os.path.join(proj_path, upscaler['dest']))

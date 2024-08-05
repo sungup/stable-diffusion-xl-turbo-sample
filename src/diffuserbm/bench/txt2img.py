@@ -1,16 +1,18 @@
 """Module providing benchmark functionality for the stable diffusion text to image conversion."""
 
-import argparse
-import numpy as np
 import os
 import random
 import re
+
+import argparse
+import numpy as np
 import torch
 
 from PIL import Image
 
-import diffuserbm.upscale as upscale
-import diffuserbm.pipeline as pipelines
+from diffuserbm import DiffuserBMConfig
+from diffuserbm import upscale
+from diffuserbm import pipeline
 from diffuserbm.perf import PerfMon
 from diffuserbm.bench import consts
 
@@ -95,13 +97,14 @@ class Bench:
 
 def post_arguments(args):
     if args.height < 500:
-        raise Exception("height cannot smaller then 500")
+        raise RuntimeError("height cannot smaller then 500")
 
     if args.width < 500:
-        raise Exception("width cannot smaller than 500")
+        raise RuntimeError("width cannot smaller than 500")
 
 
-def add_arguments(parser):
+def add_arguments(parser, _: DiffuserBMConfig):
+    """Adds arguments to the parser."""
     parser.add_argument('--device', type=str, default=consts.DEFAULT_DEVICE,
                         choices=["cuda", "cpu", "npu", "mps"],
                         help="Inference target device")
@@ -131,13 +134,16 @@ def add_arguments(parser):
                         help="Negative prompt to avoid from image")
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Options for Stable Diffusion XL Turbo Simple Benchmark",
-                                     conflict_handler='resolve')
+def parse_args(config: DiffuserBMConfig):
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Options for Stable Diffusion XL Turbo Simple Benchmark",
+        conflict_handler='resolve',
+    )
 
-    add_arguments(parser)
-    upscale.add_arguments(parser)
-    pipelines.add_arguments(parser)
+    add_arguments(parser, config)
+    upscale.add_arguments(parser, config)
+    pipeline.add_arguments(parser, config)
 
     arguments = parser.parse_args()
 
@@ -146,8 +152,9 @@ def parse_args():
     return arguments
 
 
-def bench():
-    args = parse_args()
+def bench(config: DiffuserBMConfig):
+    """Run DiffuserBM Benchmark for the Text-to-Image Generative AI workload."""
+    args = parse_args(config)
 
     perf_mon = PerfMon()
 
@@ -155,13 +162,13 @@ def bench():
         bm = Bench(args.batch_size, args.iteration, args.device, args.output, perf_mon)
 
         with perf_mon.measure_latency('Load Checkpoint', 'model'):
-            pipeline = pipelines.make(**args.__dict__)
+            bm_pipeline = pipeline.make(config, **args.__dict__)
 
         # make upscaler
         with perf_mon.measure_latency('Load Upscaler', 'model'):
-            upscaler = upscale.make(**args.__dict__)
+            upscaler = upscale.make(config, **args.__dict__)
 
-        bm.init_bench(pipeline=pipeline, upscaler=upscaler)
+        bm.init_bench(pipeline=bm_pipeline, upscaler=upscaler)
 
         bm.run(
             args.iteration,
@@ -176,5 +183,5 @@ def bench():
     if args.result == 'stdout':
         print(perf_mon.report(args.format))
     else:
-        with open(args.result, 'w') as out:
+        with open(args.result, 'w', encoding='utf-8') as out:
             out.write(perf_mon.report(args.format))

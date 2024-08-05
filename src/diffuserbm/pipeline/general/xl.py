@@ -2,24 +2,24 @@
 
 import torch
 
-from diffuserbm.pipeline.core import BenchmarkPipeline
 from diffusers import StableDiffusionXLPipeline
 from numpy import ndarray
+
+from diffuserbm.pipeline.core import BenchmarkPipeline
 
 
 class StableDiffusionXLBenchmarkPipeline(BenchmarkPipeline, type='xl', name='diffusers.sdxl'):
     def __init__(self, checkpoint, device, **_):
         super().__init__(checkpoint, device)
 
-        self.pipeline = StableDiffusionXLPipeline.from_single_file(
-            checkpoint,
-            torch_dtype=torch.float16,
-            variant='fp16',
+        self.pipeline = StableDiffusionXLPipeline.from_pretrained(
+            self.checkpoint,
+            # TODO this value will be uncommented after update variant download funtionality
+            #torch_dtype=torch.float16,
+            #variant='fp16',
             local_files_only=True,
             use_safetensors=True,
             low_cpu_mem_usage=True,
-            original_config=StableDiffusionXLBenchmarkPipeline.MODEL_CONFIG,
-            config=StableDiffusionXLBenchmarkPipeline.SUB_MODEL_CONFIG,
         )
 
         self.pipeline.to(device)

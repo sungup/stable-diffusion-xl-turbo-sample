@@ -1,2 +1,2 @@
-from diffuserbm.pipieline.onnx.xl import *
+from diffuserbm.pipeline.onnx.xl import *
 
