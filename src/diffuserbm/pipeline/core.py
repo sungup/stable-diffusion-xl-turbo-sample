@@ -16,9 +16,10 @@ class BenchmarkPipeline:
             cls=cls,
         )
 
-    def __init__(self, checkpoint, device, **_):
+    def __init__(self, checkpoint, device, pipeline, **_):
         self.__checkpoint = checkpoint
         self.__device = device
+        self.__pipeline = pipeline
 
     def __call__(self, prompt, width, height, **kwargs) -> ndarray:
         """
@@ -33,7 +34,21 @@ class BenchmarkPipeline:
         :param guidance_scale: scale of guidance for the generating image
         :return: ndarray type image
         """
-        raise RuntimeError('please define inherited function of BenchmarkPipeline.__call__')
+        negative = kwargs.get('negative', '')
+        rand_gen = kwargs.get('rand_gen', None)
+        denoising_steps = kwargs.get('denoising_steps', 8)
+        guidance_scale = kwargs.get('guidance_scale', 0.0)
+
+        return self.__pipeline(
+            prompt=prompt,
+            negative_prompt=negative,
+            generator=rand_gen,
+            num_inference_steps=denoising_steps,
+            width=width,
+            height=height,
+            guidance_scale=guidance_scale,
+            output_type='np'
+        ).images
 
     @property
     def checkpoint(self):

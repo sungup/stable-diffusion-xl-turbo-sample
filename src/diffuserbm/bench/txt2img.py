@@ -18,37 +18,38 @@ from diffuserbm.bench import consts
 
 
 class Bench:
+    """Class for benchmarking diffusion text to image generation."""
     MAX_FILE_WORD = 5
 
-    def __init__(self, batch_size, batch_count, device, output, perf: PerfMon):
+    def __init__(self, batch_size, device, output, perf: PerfMon):
         self.__perf = perf
 
-        self.device = device
-        self.output = output
+        self.__device = device
+        self.__output = output
 
-        self.batch_size = batch_size
-        self.batch_count = batch_count
+        self.__batch_size = batch_size
 
-        self.pipeline = None
-        self.upscaler = None
-        self.generators = None
+        self.__pipeline = None
+        self.__upscaler = None
+        self.__generators = None
 
-    def init_bench(self, pipeline, upscaler):
-        self.pipeline = pipeline
-        self.upscaler = upscaler
+    def init_bench(self, bm_pipeline, upscaler):
+        """Initialize the benchmark."""
+        self.__pipeline = bm_pipeline
+        self.__upscaler = upscaler
 
         with self.__perf.measure_latency('Load Randomizer', 'model'):
-            self.generators = [
-                torch.Generator(device=self.device).manual_seed(int(random.randrange(1, 9999)))
-                for _ in range(self.batch_size)
+            self.__generators = [
+                torch.Generator(device=self.__device).manual_seed(int(random.randrange(1, 9999)))
+                for _ in range(self.__batch_size)
             ]
 
     def __generate__(self, prompt, negative_prompt, width, height, denoising_steps, guidance_scale):
         with self.__perf.measure_latency('Images Generation', 'gen'):
-            return self.pipeline(
-                prompt=self.batch_size * [' '.join(prompt)],
-                negative=self.batch_size * [' '.join(negative_prompt)],
-                rand_gen=self.generators,
+            return self.__pipeline(
+                prompt=self.__batch_size * [' '.join(prompt)],
+                negative=self.__batch_size * [' '.join(negative_prompt)],
+                rand_gen=self.__generators,
                 width=width,
                 height=height,
                 denoising_steps=denoising_steps,
@@ -59,7 +60,7 @@ class Bench:
         images = []
         for image_arr in np_array:
             with self.__perf.measure_latency('Images Upscale', 'image'):
-                images.append(Image.fromarray(self.upscaler(np.uint8(image_arr*255))))
+                images.append(Image.fromarray(self.__upscaler(np.uint8(image_arr*255))))
 
         return images
 
@@ -70,9 +71,19 @@ class Bench:
 
         for i, image in enumerate(images):
             with self.__perf.measure_latency('Images Save', 'image'):
-                image.save(os.path.join(self.output, basename+'-'+str(i)+'.png'))
+                image.save(os.path.join(self.__output, basename+'-'+str(i)+'.png'))
 
     def generate(self, prompt, negative, width, height, denoising_steps, guidance_scale):
+        """
+        Generate a random image and save it as PNG files at a iteration.
+
+        :param prompt: input prompt to generate image
+        :param width: width of image
+        :param height: height of image
+        :param negative: negative prompt to avoid features not wanted in the generated image
+        :param denoising_steps: number of inference step to denoising
+        :param guidance_scale: scale of guidance for the generating image
+        """
         self.__save_image__(
             self.__upscale__(
                 self.__generate__(prompt, negative, width, height, denoising_steps, guidance_scale)
@@ -80,22 +91,30 @@ class Bench:
             prompt
         )
 
-    def run(
-        self,
-        iteration,
-        prompt,
-        negative,
-        width,
-        height,
-        denoising_steps=consts.DEFAULT_DENOISING_STEPS,
-        guidance_scale=consts.DEFAULT_GUIDANCE_SCALE
-    ):
+    def run(self, prompt, width, height, **kwargs):
+        """
+        Run benchmark for Text-to-Image generation.
+
+        :param prompt: input prompt to generate image
+        :param width: width of image
+        :param height: height of image
+        :param negative: negative prompt to avoid features not wanted in the generated image
+        :param iteration: number of iterations to generate image
+        :param denoising_steps: number of inference step to denoising
+        :param guidance_scale: scale of guidance for the generating image
+        """
+        negative = kwargs.get('negative', '')
+        iteration = kwargs.get('iteration', 1)
+        denoising_steps = kwargs.get('denoising_steps', 8)
+        guidance_scale = kwargs.get('guidance_scale', 0.0)
+
         for _ in range(iteration):
             with self.__perf.measure_latency('End-to-End Generation', 'iter'):
                 self.generate(prompt, negative, width, height, denoising_steps, guidance_scale)
 
 
 def post_arguments(args):
+    """Check arguments after parsing."""
     if args.height < 500:
         raise RuntimeError("height cannot smaller then 500")
 
@@ -159,7 +178,7 @@ def bench(config: DiffuserBMConfig):
     perf_mon = PerfMon()
 
     with perf_mon.measure_latency('End-to-End Benchmark', 'run'):
-        bm = Bench(args.batch_size, args.iteration, args.device, args.output, perf_mon)
+        bm = Bench(args.batch_size, args.device, args.output, perf_mon)
 
         with perf_mon.measure_latency('Load Checkpoint', 'model'):
             bm_pipeline = pipeline.make(config, **args.__dict__)
@@ -168,16 +187,16 @@ def bench(config: DiffuserBMConfig):
         with perf_mon.measure_latency('Load Upscaler', 'model'):
             upscaler = upscale.make(config, **args.__dict__)
 
-        bm.init_bench(pipeline=bm_pipeline, upscaler=upscaler)
+        bm.init_bench(bm_pipeline=bm_pipeline, upscaler=upscaler)
 
         bm.run(
-            args.iteration,
-            args.prompt,
-            args.negative_prompt,
-            args.width,
-            args.height,
-            args.denoising_steps,
-            args.guidance_scale
+            iteration=args.iteration,
+            prompt=args.prompt,
+            negative=args.negative_prompt,
+            width=args.width,
+            height=args.height,
+            denoising_steps=args.denoising_steps,
+            guidance_scale=args.guidance_scale
         )
 
     if args.result == 'stdout':
