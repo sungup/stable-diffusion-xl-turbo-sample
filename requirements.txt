@@ -18,7 +18,6 @@ torchvision == 0.18.1+cu121
 xformers == 0.0.27
 
 onnxruntime-gpu == 1.18.0       # for GPUs (NVIDIA or AMD)
-onnxruntime-qnn == 1.18.0       # for Qualcomm Snapdragon
 
 optimum >= 1.16.2
 optimum[onnxruntime-gpu]   # optimum for onnxruntime for GPU devices
@@ -26,5 +25,6 @@ optimum[onnxruntime-gpu]   # optimum for onnxruntime for GPU devices
 # Following packages has been commented because of conflict with CUDA environment.
 # onnxruntime == 1.18.0           # for CPU
 # onnxruntime-openvino == 1.18.0  # for Intel OpenVINO platform
+# onnxruntime-qnn == 1.18.0       # for Qualcomm Snapdragon
 # optimum[onnxruntime]       # optimum for normal onnxruntime
 # optimum[openvino]          # optimum for openvino

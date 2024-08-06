@@ -2,7 +2,7 @@
 from diffuserbm import DiffuserBMConfig
 from diffuserbm.pipeline import core
 
-import diffuserbm.pipeline.general
+import diffuserbm.pipeline.diffusers
 import diffuserbm.pipeline.onnx
 
 

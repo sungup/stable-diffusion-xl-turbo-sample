@@ -8,15 +8,21 @@ Stable diffusion offline mode running script.
 
 ```text
 +- checkpoints
-|   +- sd_xl_turbo_1.0_fp16.safetensors
+|   +- configs
+|   +- dreamshaper-8
+|   +- dreamshaper-xl
+|   +- stable-diffusion-v1.5
+|   +- stable-diffusion-v2.1
+|   +- sdxl-turbo
+|   +- upscaler
+|       +- Real-ESRGAN
 +- configs
-|   +- sd_xl_base.yaml
-+- sdxl-turbo
-+- upscaler
-|   +- Real-ESRGAN
+|   +- diffuserbm.yaml
 +- README.md
-+- basic_sdxl_turbo.py
++- main.py
 +- requirements.txt
++- requirements-maxos.txt
++- requirements-windows.txt
 ```
 
 ### Making each directory
