@@ -10,7 +10,7 @@ class StableDiffusionXLBenchmarkPipeline(BenchmarkPipeline, type='xl', name='dif
     """Class providing pipeline functionality for the Stable Diffusion XL in benchmark"""
     def __init__(self, checkpoint, device, **_):
         pipeline = StableDiffusionXLPipeline.from_pretrained(
-            self.checkpoint,
+            checkpoint,
             torch_dtype=torch.float16,
             # TODO this value will be uncommented after update variant download funtionality
             # variant='fp16',
