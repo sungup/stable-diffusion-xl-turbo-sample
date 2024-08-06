@@ -5,9 +5,9 @@ from collections import defaultdict
 
 
 _LATENCY_TABLE_HEADER_FORMAT = \
-    '| {:25} | {:17} | {:5} | {:23} |'.format('name', 'total', 'count', 'each')
+    f'| {'name':25} | {'total':17} | {'count':5} | {'each':23} |'
 _LATENCY_TABLE_ROW_SPLITTER = \
-    '+{}+{}+{}+{}+'.format('-' * 27, '-' * 19, '-' * 7, '-' * 25)
+    f'+{'-'*27}+{'-'*19}+{'-'*7}+{'-'*25}+'
 _LATENCY_TABLE_ROW_FORMAT = \
     '| {name:25} | {total:-12,.2f} msec | {count:-5} | {each:-12,.2f} msec/{unit:5} |'
 _LATENCY_CSV_HEADER_FORMAT = \
@@ -90,12 +90,8 @@ class _LatencyAggregator:
         }
 
     def __str__(self):
-        return '{name}: {total} msec, {each} msec/{unit}'.format(
-            name=self.__name,
-            total=self.__value,
-            each=self.__value / self.__count,
-            unit=self.__unit,
-        )
+        each = self.__value / self.__count
+        return f'{self.__name}: {self.__value:.2f} msec, {each:.2f} msec/{self.__unit}'
 
     @property
     def __table_row__(self):
