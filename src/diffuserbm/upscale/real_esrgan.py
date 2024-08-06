@@ -1,12 +1,12 @@
 """Module providing upscaler functionality for the Real-ESRGAN model."""
-
-from diffuserbm.upscale.core import UpScaler
-
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
 
+from diffuserbm.upscale.core import UpScaler
+
 
 class RealESRGANUpScaler(UpScaler, name='r-esrgan'):
+    """Upscaler class of Real-ESRGAN."""
     def __init__(self, model_path, scale, device):
         super().__init__(scale=scale)
 
