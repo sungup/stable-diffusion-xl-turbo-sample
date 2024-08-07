@@ -16,13 +16,16 @@ torch == 2.3.1
 torchvision == 0.18.1
 xformers == 0.0.27
 
-onnxruntime == 1.18.0           # for CPU
-# onnxruntime-gpu == 1.18.0       # not supported on macos
-# onnxruntime-openvino == 1.18.0  # not supported on macos
-# onnxruntime-qnn == 1.18.0       # not supported on macos
+onnxruntime == 1.18.1           # for CPU
+# onnxconverter-common
 
 optimum >= 1.16.2
 optimum[onnxruntime]       # optimum for normal onnxruntime
+
+# Following packages has been commented because of HW limitation
+# onnxruntime-gpu == 1.18.1       # not supported on macos
+# onnxruntime-openvino == 1.18.1  # not supported on macos
+# onnxruntime-qnn == 1.18.1       # not supported on macos
 # optimum[onnxruntime-gpu]   # not supported on macos
 # optimum[openvino]          # not supported on macos
 

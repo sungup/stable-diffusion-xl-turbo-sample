@@ -49,7 +49,8 @@ class Bench:
             return self.__pipeline(
                 prompt=self.__batch_size * [' '.join(prompt)],
                 negative=self.__batch_size * [' '.join(negative_prompt)],
-                rand_gen=self.__generators,
+                # TODO has been commented to implement ONNX based generation
+                # rand_gen=self.__generators,
                 width=width,
                 height=height,
                 denoising_steps=denoising_steps,

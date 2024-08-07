@@ -5,9 +5,9 @@ from collections import defaultdict
 
 
 _LATENCY_TABLE_HEADER_FORMAT = \
-    f'| {'name':25} | {'total':17} | {'count':5} | {'each':23} |'
+    f'| {"name":25} | {"total":17} | {"count":5} | {"each":23} |'
 _LATENCY_TABLE_ROW_SPLITTER = \
-    f'+{'-'*27}+{'-'*19}+{'-'*7}+{'-'*25}+'
+    f'+{"-"*27}+{"-"*19}+{"-"*7}+{"-"*25}+'
 _LATENCY_TABLE_ROW_FORMAT = \
     '| {name:25} | {total:-12,.2f} msec | {count:-5} | {each:-12,.2f} msec/{unit:5} |'
 _LATENCY_CSV_HEADER_FORMAT = \

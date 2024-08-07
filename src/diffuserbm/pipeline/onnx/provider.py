@@ -37,7 +37,8 @@ class CUDAProvider(Provider, device='cuda', provider='CUDAExecutionProvider'):
         """Property getter for NVIDIA provider options"""
         return {
             "device_id": torch.cuda.current_device(),
-            "user_compute_stream": str(torch.cuda.current_stream().cuda_stream)
+            "user_compute_stream": str(torch.cuda.current_stream().cuda_stream),
+            "cudnn_conv_use_max_workspace": "1"
         }
 
 
