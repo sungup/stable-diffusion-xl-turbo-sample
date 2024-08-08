@@ -4,9 +4,7 @@ import os
 import random
 import re
 
-import argparse
 import numpy as np
-import torch
 
 from PIL import Image
 
@@ -21,36 +19,30 @@ class Bench:
     """Class for benchmarking diffusion text to image generation."""
     MAX_FILE_WORD = 5
 
-    def __init__(self, batch_size, device, output, perf: PerfMon):
+    def __init__(self, batch_size, output, perf: PerfMon):
         self.__perf = perf
 
-        self.__device = device
         self.__output = output
 
         self.__batch_size = batch_size
 
         self.__pipeline = None
         self.__upscaler = None
-        self.__generators = None
 
     def init_bench(self, bm_pipeline, upscaler):
         """Initialize the benchmark."""
         self.__pipeline = bm_pipeline
         self.__upscaler = upscaler
 
-        with self.__perf.measure_latency('Load Randomizer', 'model'):
-            self.__generators = [
-                torch.Generator(device=self.__device).manual_seed(int(random.randrange(1, 9999)))
-                for _ in range(self.__batch_size)
-            ]
+    def __generate__(self, prompt, width, height, **kwargs):
+        negative_prompt = kwargs.get('negative_prompt', '')
+        denoising_steps = kwargs.get('denoising_steps', 8)
+        guidance_scale = kwargs.get('guidance_scale', 0.0)
 
-    def __generate__(self, prompt, negative_prompt, width, height, denoising_steps, guidance_scale):
         with self.__perf.measure_latency('Images Generation', 'gen'):
             return self.__pipeline(
                 prompt=self.__batch_size * [' '.join(prompt)],
                 negative=self.__batch_size * [' '.join(negative_prompt)],
-                # TODO has been commented to implement ONNX based generation
-                # rand_gen=self.__generators,
                 width=width,
                 height=height,
                 denoising_steps=denoising_steps,
@@ -74,20 +66,35 @@ class Bench:
             with self.__perf.measure_latency('Images Save', 'image'):
                 image.save(os.path.join(self.__output, basename+'-'+str(i)+'.png'))
 
-    def generate(self, prompt, negative, width, height, denoising_steps, guidance_scale):
+    def generate(self, prompt, width, height, **kwargs):
         """
-        Generate a random image and save it as PNG files at a iteration.
+        Generate a random image and save it as PNG files at an iteration.
 
-        :param prompt: input prompt to generate image
-        :param width: width of image
-        :param height: height of image
-        :param negative: negative prompt to avoid features not wanted in the generated image
-        :param denoising_steps: number of inference step to denoising
-        :param guidance_scale: scale of guidance for the generating image
+        Args:
+          prompt (str): input prompt to generate image
+          width (int): width of image
+          height (int): height of image
+
+        Kwargs:
+            negative (str): negative prompt to avoid features not wanted in the generated image
+            denoising_steps (int): number of inference step to denoising
+            guidance_scale (float): scale of guidance for the generating image
+
         """
+        negative = kwargs.get('negative', '')
+        denoising_steps = kwargs.get('denoising_steps', 8)
+        guidance_scale = kwargs.get('guidance_scale', 0.0)
+
         self.__save_image__(
             self.__upscale__(
-                self.__generate__(prompt, negative, width, height, denoising_steps, guidance_scale)
+                self.__generate__(
+                    prompt=prompt,
+                    width=width,
+                    height=height,
+                    negative_prompt=negative,
+                    denoising_steps=denoising_steps,
+                    guidance_scale=guidance_scale,
+                )
             ),
             prompt
         )
@@ -96,13 +103,17 @@ class Bench:
         """
         Run benchmark for Text-to-Image generation.
 
-        :param prompt: input prompt to generate image
-        :param width: width of image
-        :param height: height of image
-        :param negative: negative prompt to avoid features not wanted in the generated image
-        :param iteration: number of iterations to generate image
-        :param denoising_steps: number of inference step to denoising
-        :param guidance_scale: scale of guidance for the generating image
+        Args:
+          prompt (str): input prompt to generate image
+          width (int): width of image
+          height (int): height of image
+
+        Kwargs:
+            negative (str): negative prompt to avoid features not wanted in the generated image
+            iteration (int): number of inference step to generate image
+            denoising_steps (int): number of inference step to denoising
+            guidance_scale (float): scale of guidance for the generating image
+
         """
         negative = kwargs.get('negative', '')
         iteration = kwargs.get('iteration', 1)
@@ -111,23 +122,28 @@ class Bench:
 
         for _ in range(iteration):
             with self.__perf.measure_latency('End-to-End Generation', 'iter'):
-                self.generate(prompt, negative, width, height, denoising_steps, guidance_scale)
+                self.generate(
+                    prompt=prompt,
+                    width=width,
+                    height=height,
+                    negative=negative,
+                    denoising_steps=denoising_steps,
+                    guidance_scale=guidance_scale,
+                )
 
 
-def post_arguments(args):
-    """Check arguments after parsing."""
-    if args.height < 500:
-        raise RuntimeError("height cannot smaller then 500")
-
-    if args.width < 500:
-        raise RuntimeError("width cannot smaller than 500")
+def command_help() -> str:
+    """Returns a help string for Txt2Img benchmark arguments parser."""
+    return 'Text to Image Benchmark'
 
 
-def add_arguments(parser, _: DiffuserBMConfig):
+def command_name() -> str:
+    """Returns sub-command name for Txt2Img benchmark."""
+    return 'txt2img'
+
+
+def add_arguments(parser, config: DiffuserBMConfig):
     """Adds arguments to the parser."""
-    parser.add_argument('--device', type=str, default=consts.DEFAULT_DEVICE,
-                        choices=["cuda", "cpu", "npu", "mps"],
-                        help="Inference target device")
     parser.add_argument('--batch-size', type=int, default=consts.DEFAULT_BATCH_SIZE,
                         help="Number of images to generate in a sequence, one  at a time")
     parser.add_argument('--iteration', type=int, default=consts.DEFAULT_BATCH_COUNT,
@@ -153,33 +169,25 @@ def add_arguments(parser, _: DiffuserBMConfig):
                         default=consts.DEFAULT_NEGATIVE_PROMPT,
                         help="Negative prompt to avoid from image")
 
-
-def parse_args(config: DiffuserBMConfig):
-    """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Options for Stable Diffusion XL Turbo Simple Benchmark",
-        conflict_handler='resolve',
-    )
-
-    add_arguments(parser, config)
     upscale.add_arguments(parser, config)
     pipeline.add_arguments(parser, config)
 
-    arguments = parser.parse_args()
 
-    post_arguments(arguments)
+def post_arguments(args):
+    """Check arguments after parsing."""
+    if args.height < 500:
+        raise RuntimeError("height cannot smaller then 500")
 
-    return arguments
+    if args.width < 500:
+        raise RuntimeError("width cannot smaller than 500")
 
 
-def bench(config: DiffuserBMConfig):
+def run(args, config: DiffuserBMConfig):
     """Run DiffuserBM Benchmark for the Text-to-Image Generative AI workload."""
-    args = parse_args(config)
-
     perf_mon = PerfMon()
 
     with perf_mon.measure_latency('End-to-End Benchmark', 'run'):
-        bm = Bench(args.batch_size, args.device, args.output, perf_mon)
+        bm = Bench(args.batch_size, args.output, perf_mon)
 
         with perf_mon.measure_latency('Load Checkpoint', 'model'):
             bm_pipeline = pipeline.make(config, **args.__dict__)

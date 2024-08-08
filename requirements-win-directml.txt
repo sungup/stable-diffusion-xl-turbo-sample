@@ -10,13 +10,14 @@ realesrgan
 requests
 transformers
 wheel
+wmi
 
 # install general version of torch
 torch == 2.3.1
 torchvision == 0.18.1
 
-onnxruntime == 1.18.1           # for CPU
+onnxruntime-directml == 1.18.1  # use DirectML for DirectX supported GPU (NVIDIA/AMD/Intel)
 
 optimum >= 1.16.2
-optimum[onnxruntime]       # optimum for normal onnxruntime
+optimum[onnxruntime-directml]   # optimum for onnxruntime-directml
 

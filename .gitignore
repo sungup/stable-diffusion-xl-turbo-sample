@@ -1,11 +1,9 @@
-sdxl-turbo
 output/*
 checkpoints/*
-models/*
-upscaler/*
 .idea
 .vscode
 .venv
+.venv-*
 *.pyc
 *.DS_Store
 requirements.txt

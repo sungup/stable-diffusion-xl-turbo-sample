@@ -1,4 +1,4 @@
-"""Module providing utlities for benchmark"""
+"""Module providing utilities for benchmark"""
 import os
 
 import yaml

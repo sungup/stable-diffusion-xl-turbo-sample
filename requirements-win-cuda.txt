@@ -1,0 +1,25 @@
+accelerate >= 0.32.1
+basicsr
+diffusers >= 0.29.2
+gitpython
+ninja
+numpy
+pillow
+pyyaml
+realesrgan
+requests
+transformers
+wheel
+wmi
+
+# install prebuilt version with CUDA 11.8 from download.pytorch.org
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch == 2.3.1+cu118
+torchvision == 0.18.1+cu118
+xformers == 0.0.27
+
+onnxruntime-gpu == 1.18.1  # for GPUs (CUDA or TensorRT)
+
+optimum >= 1.16.2
+optimum[onnxruntime-gpu]   # optimum for onnxruntime for GPU devices
+
