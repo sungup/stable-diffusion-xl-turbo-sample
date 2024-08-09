@@ -8,20 +8,23 @@ from onnxruntime.quantization import quantize_dynamic, QuantType
 from onnxruntime.transformers import float16
 
 
-def to_int8(src_model, dst_model):
+def to_int8(src_model: str, dst_model: str):
     """quantize to int8 (answer from ChatGPT)"""
     quantize_dynamic(src_model, dst_model, weight_type=QuantType.QInt8)
 
 
-def to_fp16(src_model, dst_model):
+def to_fp16(src_model: str, dst_model: str):
     """reference code from Microsoft"""
     onnx.save(float16.convert_float_to_float16(onnx.load(src_model)), dst_model)
 
     raise NotImplementedError("not implemented yet to_fp16")
 
 
-def quantize(src, dst, quant_to):
+def quantize(src: str, dst: str, quant_to):
     """Quantize model to selected level"""
+    if os.path.isdir(dst):
+        return
+
     for src_dir, dirs, files in os.walk(src):
         dst_dir = src_dir.replace(src, dst)
 

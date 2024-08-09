@@ -43,7 +43,7 @@ def main():
 
     module, args = parse_args(config=config)
 
-    module.run(args=args, config=config)
+    module.run(args, config)
 
 
 if __name__ == '__main__':

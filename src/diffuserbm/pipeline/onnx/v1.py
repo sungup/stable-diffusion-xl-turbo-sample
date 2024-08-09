@@ -10,9 +10,11 @@ class StableDiffusionBenchmarkPipeline(BenchmarkPipeline, type='v1', engine='onn
     def __init__(self, checkpoint, device, **kwargs):
         self.provider = get_provider(device, **kwargs)
 
+        is_int8 = kwargs.get('onnx.int8', False)
+
         # TODO update checkpoint path of ONNX
         pipeline = ORTStableDiffusionPipeline.from_pretrained(
-            checkpoint + '.int8.onnx',
+            checkpoint + f'.{"int8" if is_int8 else "fp32"}.onnx',
             local_files_only=True,
             provider=self.provider.name,
             session_options=self.provider.session_options,

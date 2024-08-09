@@ -14,26 +14,31 @@ checkpoints:
   v1:
     - id: "runwayml/stable-diffusion-v1-5"
       dest: "checkpoints/stable-diffusion-v1.5"
-      variant: 'fp16'
-      dtype: 'float16'
+      use_onnx:
+        fp32: true
+        int8: true
     - id: "lykon/dreamshaper-8"
       dest: "checkpoints/dreamshaper-8"
-      variant: 'fp16'
-      dtype: 'float16'
+      use_onnx:
+        fp32: true
+        int8: true
   v2:
     - id: "stabilityai/stable-diffusion-2-1"
       dest: "checkpoints/stable-diffusion-v2.1"
-      variant: 'fp16'
-      dtype: 'float16'
+      use_onnx:
+        fp32: true
+        int8: true
   xl:
     - id: "stabilityai/sdxl-turbo"
       dest: "checkpoints/sdxl-turbo"
-      variant: 'fp16'
-      dtype: 'float16'
+      use_onnx:
+        fp32: true
+        int8: true
     - id: "lykon/dreamshaper-xl-v2-turbo"
       dest: "checkpoints/dreamshaper-xl-turbo"
-      variant: 'fp16'
-      dtype: 'float16'
+      use_onnx:
+        fp32: true
+        int8: true
 
 upscaler:
   r-esrgan:

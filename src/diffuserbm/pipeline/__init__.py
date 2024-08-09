@@ -8,7 +8,7 @@ import diffuserbm.pipeline.onnx
 DEVICE_TYPES = ['cuda', 'cpu', 'npu', 'mps', 'rocm', 'dml']
 
 
-def make(config: DiffuserBMConfig, pipeline, checkpoint, device, **kwargs):
+def make(config: DiffuserBMConfig, pipeline: str, checkpoint: str, device: str, **kwargs):
     """Make pipeline for the stable diffusion model"""
     checkpoint = config.checkpoint(checkpoint)
 
@@ -32,3 +32,5 @@ def add_arguments(parser, config: DiffuserBMConfig):
     parser.add_argument('--onnx.device_id', type=int, default=0,
                         help='Target GPU device_id for ONNX (Windows only). '
                              'Please check running `gpus` sub-command')
+    parser.add_argument('--onnx.int8', action="store_true",
+                        help='Use int8 quantized model for ONNX')
